@@ -8,10 +8,13 @@ import (
   "os"
   "io/ioutil"
   "strings"
+  "flag"
+  "fmt"
 )
 
 var blocked_filename = "./blocked_hosts"
 var request_number = 0
+var port = flag.Int("port", 8080, "the port to listen for requests on")
 
 func slowBan(r *http.Request, cst *goproxy.ProxyCtx) (*http.Request, *http.Response) {
   log.Println("banned request for", r.URL.String(), ", waiting:",request_number * 500,"milliseconds");
@@ -21,6 +24,7 @@ func slowBan(r *http.Request, cst *goproxy.ProxyCtx) (*http.Request, *http.Respo
 }
 
 func main() {
+  flag.Parse()
   proxy := goproxy.NewProxyHttpServer()
   proxy.Verbose = false
 
@@ -43,6 +47,6 @@ func main() {
     proxy.OnRequest(goproxy.DstHostIs(website)).DoFunc(slowBan)
   }
 
-  log.Println("starting proxy on :8080")
-  http.ListenAndServe(":8080", proxy)
+  log.Println("starting proxy on :", *port)
+  log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), proxy))
 }
