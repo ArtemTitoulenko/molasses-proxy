@@ -15,16 +15,26 @@ import (
 var blocked_filename = "./blocked_hosts"
 var request_number = 0
 var port = flag.Int("port", 8080, "the port to listen for requests on")
+var delay = flag.Int("delayms", 500, "increase the delay by this many milliseconds per request")
+var help = flag.Bool("help", false, "print this help message")
 
 func slowBan(r *http.Request, cst *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-  log.Println("banned request for", r.URL.String(), ", waiting:",request_number * 500,"milliseconds");
-  time.Sleep(time.Duration(request_number) * time.Second/2)
+  log.Println("banned request for", r.URL.String(), ", waiting:",request_number * (*delay),"milliseconds");
+  time.Sleep(time.Duration(request_number * (*delay)))
   request_number += 1
   return r, nil
 }
 
 func main() {
   flag.Parse()
+
+  if *help {
+    fmt.Println("usage:\n\n\tmolasses-proxy [--port=8080] [--delayms=500]\n")
+    flag.PrintDefaults()
+    return
+  }
+
+
   proxy := goproxy.NewProxyHttpServer()
   proxy.Verbose = false
 
@@ -47,6 +57,6 @@ func main() {
     proxy.OnRequest(goproxy.DstHostIs(website)).DoFunc(slowBan)
   }
 
-  log.Println("starting proxy on :", *port)
+  log.Println("starting proxy on :", *port, "delaying", *delay, "more milliseconds per request")
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), proxy))
 }
