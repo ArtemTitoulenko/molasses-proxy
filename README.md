@@ -20,4 +20,10 @@ lines. An example config is supplied.
 ## Getting Help
 
     $ molasses-proxy --help
+      usage:
 
+          molasses-proxy [--port=8080] [--delayms=500]
+
+      -delayms=500: increase the delay by this many milliseconds per request
+      -help=false: print this help message
+      -port=8080: the port to listen for requests on
