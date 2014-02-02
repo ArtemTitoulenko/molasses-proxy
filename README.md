@@ -4,7 +4,7 @@ Molasses Proxy is a bandwidth-limiting proxy. It can be used to constrain the ba
 
 ## Installation
 
-    $ go install github.com/ArtemTitoulenko/molasses-proxy
+    $ go install github.com/ox/molasses-proxy
 
 
 ## Running
