@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/elazarl/goproxy"
 	"github.com/ox/molasses-proxy/linkio"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -14,7 +15,7 @@ var port = flag.Int("port", 8080,
 var help = flag.Bool("help", false,
 	"print this help message")
 var rate = flag.Int("rate", 56,
-	"set the maximum link rate in kbps")
+	"the maximum link rate in kbps")
 
 func main() {
 	flag.Parse()
@@ -23,14 +24,23 @@ func main() {
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = false
 
+	proxy.OnRequest().DoFunc(
+		func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			req.Body = ioutil.NopCloser(slowLink.NewLinkReader(req.Body))
+			return req, nil
+		})
+
 	proxy.OnResponse().DoFunc(
 		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
-			resp.Body = slowLink.NewLinkReader(resp.Body)
+			if resp.Body != nil {
+				resp.Body = ioutil.NopCloser(slowLink.NewLinkReader(resp.Body))
+			}
+
 			return resp
 		})
 
 	if *help {
-		fmt.Println("usage:\n\n\tmolasses-proxy [--port=8080] [--rate=0]\n")
+		fmt.Println("usage:\n\n\tmolasses-proxy [--port=8080] [--rate=56]\n")
 		flag.PrintDefaults()
 		return
 	}

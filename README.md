@@ -1,17 +1,11 @@
 # Molasses Proxy
 
-Molasses Proxy waits longer and longer to return a response for a list of blocked
-hosts. It's useful for slow-banning computers on a network and discouraging the
-use of certain websites.
+Molasses Proxy is a bandwidth-limiting proxy. It can be used to constrain the bandwidth of all HTTP requests passing though it.
 
 ## Installation
-First, install the binary.
 
     $ go get github.com/ArtemTitoulenko/molasses-proxy
 
-Then in some directory where you plan on running the proxy, create a
-`blocked_hosts` file and list websites you would want to block on separate
-lines. An example config is supplied.
 
 ## Running
 
@@ -22,8 +16,8 @@ lines. An example config is supplied.
     $ molasses-proxy --help
       usage:
 
-          molasses-proxy [--port=8080] [--delayms=500]
+          molasses-proxy [--port=8080] [--rate=56]
 
-      -delayms=500: increase the delay by this many milliseconds per request
-      -help=false: print this help message
-      -port=8080: the port to listen for requests on
+	  -help=false: print this help message
+	  -port=8080: the port to listen for requests on
+	  -rate=56: the maximum link rate in kbps

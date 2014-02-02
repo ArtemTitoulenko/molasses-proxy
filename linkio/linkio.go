@@ -103,7 +103,3 @@ func (l *LinkReader) Read(buf []byte) (n int, err error) {
 
 	return
 }
-
-func (l *LinkReader) Close() error {
-	return nil
-}
